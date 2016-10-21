@@ -5,8 +5,7 @@ Ldap plugin for dokku based on
 d203db3](https://github.com/dokku/dokku-mariadb/commit/d203bd3c0ee759c7b6e64bef26eee4555787da5f). Currently defaults to installing
 [???](https://hub.docker.com/).
 
-## TODO: update following documentation
-## requirements
+## requirements (correct?)
 
 - dokku 0.4.x+
 - docker 1.8.x
@@ -15,82 +14,82 @@ d203db3](https://github.com/dokku/dokku-mariadb/commit/d203bd3c0ee759c7b6e64bef2
 
 ```shell
 # on 0.4.x+
-sudo dokku plugin:install https://github.com/dokku/dokku-mariadb.git mariadb
+sudo dokku plugin:install https://github.com/RoboMod/dokku-ldap.git ldap
 ```
 
 ## commands
 
 ```
-mariadb:clone <name> <new-name>  Create container <new-name> then copy data from <name> into <new-name>
-mariadb:connect <name>           Connect via mariadb to a mariadb service
-mariadb:create <name>            Create a mariadb service with environment variables
-mariadb:destroy <name>           Delete the service and stop its container if there are no links left
-mariadb:enter <name> [command]   Enter or run a command in a running mariadb service container
-mariadb:export <name> > <file>   Export a dump of the mariadb service database
-mariadb:expose <name> [port]     Expose a mariadb service on custom port if provided (random port otherwise)
-mariadb:import <name> < <file>   Import a dump into the mariadb service database
-mariadb:info <name>              Print the connection information
-mariadb:link <name> <app>        Link the mariadb service to the app
-mariadb:list                     List all mariadb services
-mariadb:logs <name> [-t]         Print the most recent log(s) for this service
-mariadb:promote <name> <app>     Promote service <name> as DATABASE_URL in <app>
-mariadb:restart <name>           Graceful shutdown and restart of the mariadb service container
-mariadb:start <name>             Start a previously stopped mariadb service
-mariadb:stop <name>              Stop a running mariadb service
-mariadb:unexpose <name>          Unexpose a previously exposed mariadb service
-mariadb:unlink <name> <app>      Unlink the mariadb service from the app
+(ldap:clone <name> <new-name>  Create container <new-name> then copy directory from <name> into <new-name>)
+ldap:create <name>            Create an ldap service with environment variables
+ldap:destroy <name>           Delete the service and stop its container if there are no links left
+ldap:enter <name> [command]   Enter or run a command in a running ldap service container
+ldap:export <name> > <file>   Export a dump of the ldap service directory
+ldap:expose <name> [port]     Expose an ldap service on custom port if provided (random port otherwise)
+ldap:import <name> < <file>   Import a dump into the ldap service directory
+ldap:info <name>              Print the connection information
+ldap:link <name> <app>        Link the ldap service to the app
+ldap:list                     List all ldap services
+ldap:logs <name> [-t]         Print the most recent log(s) for this service
+ldap:promote <name> <app>     Promote service <name> as LDAP_URL in <app>
+ldap:restart <name>           Graceful shutdown and restart of the ldap service container
+ldap:start <name>             Start a previously stopped ldap service
+ldap:stop <name>              Stop a running ldap service
+ldap:unexpose <name>          Unexpose a previously exposed ldap service
+ldap:unlink <name> <app>      Unlink the ldap service from the app
 ```
 
 ## usage
 
 ```shell
-# create a mariadb service named lolipop
-dokku mariadb:create lolipop
+# create a ldap service named lolipop
+dokku ldap:create lolipop
 
 # you can also specify the image and image
 # version to use for the service
 # it *must* be compatible with the
-# official mariadb image
-export MARIADB_IMAGE="mariadb"
-export MARIADB_IMAGE_VERSION="5.5"
-dokku mariadb:create lolipop
+# used ldap image
+export LDAP_IMAGE="<image name>"
+export LDAP_IMAGE_VERSION="<version>"
+dokku ldap:create lolipop
 
 # you can also specify custom environment
 # variables to start the mariadb service
 # in semi-colon separated forma
-export MARIADB_CUSTOM_ENV="USER=alpha;HOST=beta"
-dokku mariadb:create lolipop
+export LDAP_CUSTOM_ENV="USER=alpha;HOST=beta"
+dokku ldap:create lolipop
 
 # get connection information as follows
-dokku mariadb:info lolipop
+dokku ldap:info lolipop
 
 # you can also retrieve a specific piece of service info via flags
-dokku mariadb:info lolipop --config-dir
-dokku mariadb:info lolipop --data-dir
-dokku mariadb:info lolipop --dsn
-dokku mariadb:info lolipop --exposed-ports
-dokku mariadb:info lolipop --id
-dokku mariadb:info lolipop --internal-ip
-dokku mariadb:info lolipop --links
-dokku mariadb:info lolipop --service-root
-dokku mariadb:info lolipop --status
-dokku mariadb:info lolipop --version
+dokku ldap:info lolipop --config-dir
+dokku ldap:info lolipop --data-dir
+dokku ldap:info lolipop --dsn
+dokku ldap:info lolipop --exposed-ports
+dokku ldap:info lolipop --id
+dokku ldap:info lolipop --internal-ip
+dokku ldap:info lolipop --links
+dokku ldap:info lolipop --service-root
+dokku ldap:info lolipop --status
+dokku ldap:info lolipop --version
 
 # a bash prompt can be opened against a running service
 # filesystem changes will not be saved to disk
-dokku mariadb:enter lolipop
+dokku ldap:enter lolipop
 
 # you may also run a command directly against the service
 # filesystem changes will not be saved to disk
-dokku mariadb:enter lolipop ls -lah /
+dokku ldap:enter lolipop ls -lah /
 
-# a mariadb service can be linked to a
+# an ldap service can be linked to a
 # container this will use native docker
 # links via the docker-options plugin
 # here we link it to our 'playground' app
 # NOTE: this will restart your app
-dokku mariadb:link lolipop playground
+dokku ldap:link lolipop playground
 
+## TODO: update following documentation
 # the following environment variables will be set automatically by docker (not
 # on the app itself, so they won’t be listed when calling dokku config)
 #
@@ -103,49 +102,49 @@ dokku mariadb:link lolipop playground
 #
 # and the following will be set on the linked application by default
 #
-#   DATABASE_URL=mysql://mariadb:SOME_PASSWORD@dokku-mariadb-lolipop:3306/lolipop
+#   DATABASE_URL=mysql://ldap:SOME_PASSWORD@dokku-mariadb-lolipop:3306/lolipop
 #
 # NOTE: the host exposed here only works internally in docker containers. If
 # you want your container to be reachable from outside, you should use `expose`.
 
 # another service can be linked to your app
-dokku mariadb:link other_service playground
+dokku ldap:link other_service playground
 
 # since DATABASE_URL is already in use, another environment variable will be
 # generated automatically
 #
-#   DOKKU_MARIADB_BLUE_URL=mysql://mariadb:ANOTHER_PASSWORD@dokku-mariadb-other-service:3306/other_service
+#   DOKKU_MARIADB_BLUE_URL=mysql://ldap:ANOTHER_PASSWORD@dokku-mariadb-other-service:3306/other_service
 
 # you can then promote the new service to be the primary one
 # NOTE: this will restart your app
-dokku mariadb:promote other_service playground
+dokku ldap:promote other_service playground
 
 # this will replace DATABASE_URL with the url from other_service and generate
 # another environment variable to hold the previous value if necessary.
 # you could end up with the following for example:
 #
-#   DATABASE_URL=mysql://mariadb:ANOTHER_PASSWORD@dokku-mariadb-other_service:3306/other_service
-#   DOKKU_MARIADB_BLUE_URL=mysql://mariadb:ANOTHER_PASSWORD@dokku-mariadb-other-service:3306/other_service
-#   DOKKU_MARIADB_SILVER_URL=mysql://mariadb:SOME_PASSWORD@dokku-mariadb-lolipop:3306/lolipop
+#   DATABASE_URL=mysql://ldap:ANOTHER_PASSWORD@dokku-mariadb-other_service:3306/other_service
+#   DOKKU_MARIADB_BLUE_URL=mysql://ldap:ANOTHER_PASSWORD@dokku-mariadb-other-service:3306/other_service
+#   DOKKU_MARIADB_SILVER_URL=mysql://ldap:SOME_PASSWORD@dokku-mariadb-lolipop:3306/lolipop
 
 # you can also unlink a mariadb service
 # NOTE: this will restart your app and unset related environment variables
 
 # you can tail logs for a particular service
-dokku mariadb:logs lolipop
-dokku mariadb:logs lolipop -t # to tail
+dokku ldap:logs lolipop
+dokku ldap:logs lolipop -t # to tail
 
 # you can dump the database
-dokku mariadb:export lolipop > lolipop.sql
+dokku ldap:export lolipop > lolipop.sql
 
 # you can import a dump
-dokku mariadb:import lolipop < database.sql
+dokku ldap:import lolipop < database.sql
 
 # you can clone an existing database to a new one
-dokku mariadb:clone lolipop new_database
+dokku ldap:clone lolipop new_database
 
 # finally, you can destroy the container
-dokku mariadb:destroy lolipop
+dokku ldap:destroy lolipop
 ```
 
 ## Changing database adapter
@@ -155,15 +154,15 @@ the environment variable MARIADB_DATABASE_SCHEME on the app:
 
 ```
 dokku config:set playground MARIADB_DATABASE_SCHEME=mariadb2
-dokku mariadb:link lolipop playground
+dokku ldap:link lolipop playground
 ```
 
 Will cause DATABASE_URL to be set as
-mariadb2://mariadb:SOME_PASSWORD@dokku-mariadb-lolipop:3306/lolipop
+mariadb2://ldap:SOME_PASSWORD@dokku-mariadb-lolipop:3306/lolipop
 
 CAUTION: Changing MARIADB_DATABASE_SCHEME after linking will cause dokku to
-believe the mariadb is not linked when attempting to use `dokku mariadb:unlink`
-or `dokku mariadb:promote`.
+believe the mariadb is not linked when attempting to use `dokku ldap:unlink`
+or `dokku ldap:promote`.
 You should be able to fix this by
 
 - Changing MARIADB_URL manually to the new value.

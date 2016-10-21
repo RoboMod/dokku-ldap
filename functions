@@ -22,15 +22,15 @@ service_create() {
   mkdir -p "$SERVICE_ROOT" || dokku_log_fail "Unable to create service directory"
   mkdir -p "$SERVICE_ROOT/data" || dokku_log_fail "Unable to create service data directory"
   mkdir -p "$SERVICE_ROOT/config" || dokku_log_fail "Unable to create service config directory"
-  rootpassword=$(openssl rand -hex 8)
   password=$(openssl rand -hex 8)
-  echo "$rootpassword" > "$SERVICE_ROOT/ROOTPASSWORD"
+  configpassword=$(openssl rand -hex 8)
   echo "$password" > "$SERVICE_ROOT/PASSWORD"
-  chmod 640 "$SERVICE_ROOT/ROOTPASSWORD" "$SERVICE_ROOT/PASSWORD"
+  echo "$password" > "$SERVICE_ROOT/CONFIGPASSWORD"
+  chmod 640 "$SERVICE_ROOT/PASSWORD" "$SERVICE_ROOT/CONFIGPASSWORD"
   touch "$LINKS_FILE"
 
-  if [[ -n $MARIADB_CUSTOM_ENV ]]; then
-    echo "$MARIADB_CUSTOM_ENV" | tr ';' "\n" > "$SERVICE_ROOT/ENV"
+  if [[ -n $LDAP_CUSTOM_ENV ]]; then
+    echo "$LDAP_CUSTOM_ENV" | tr ';' "\n" > "$SERVICE_ROOT/ENV"
   else
     echo "" > "$SERVICE_ROOT/ENV"
   fi
@@ -41,10 +41,10 @@ service_create_container() {
   local SERVICE="$1"
   local SERVICE_ROOT="$PLUGIN_DATA_ROOT/$SERVICE"
   local SERVICE_NAME="$(get_service_name "$SERVICE")"
-  local ROOTPASSWORD="$(cat "$SERVICE_ROOT/ROOTPASSWORD")"
   local PASSWORD="$(cat "$SERVICE_ROOT/PASSWORD")"
+  local CONFIGPASSWORD="$(cat "$SERVICE_ROOT/CONFIGPASSWORD")"
 
-  ID=$(docker run --name "$SERVICE_NAME" -v "$SERVICE_ROOT/data:/var/lib/mysql" -e "MYSQL_ROOT_PASSWORD=$ROOTPASSWORD" -e MYSQL_USER=mariadb -e "MYSQL_PASSWORD=$PASSWORD" -e "MYSQL_DATABASE=$SERVICE" --env-file="$SERVICE_ROOT/ENV" -d --restart always --label dokku=service --label dokku.service=mariadb "$PLUGIN_IMAGE:$PLUGIN_IMAGE_VERSION")
+  ID=$(docker run --name "$SERVICE_NAME" -v "$SERVICE_ROOT/data:/var/lib/ldap" -e "SLAPD_PASSWORD=$PASSWORD" -e "SLAP_CONFIG_PASSWORD=$CONFIGPASSWORD" -e "SLAP_DOMAIN=$SERVICE" --env-file="$SERVICE_ROOT/ENV" -d --restart always --label dokku=service --label dokku.service=mariadb "$PLUGIN_IMAGE:$PLUGIN_IMAGE_VERSION")
   echo "$ID" > "$SERVICE_ROOT/ID"
 
   dokku_log_verbose_quiet "Waiting for container to be ready"
@@ -61,6 +61,7 @@ service_export() {
   local PASSWORD="$(cat "$SERVICE_ROOT/PASSWORD")"
 
   [[ -n $SSH_TTY ]] && stty -opost
+  # TODO:
   docker exec "$SERVICE_NAME" mysqldump --user=mariadb --password="$PASSWORD" "$SERVICE"
   status=$?
   [[ -n $SSH_TTY ]] && stty opost
@@ -76,9 +77,11 @@ service_import() {
   if [[ -t 0 ]]; then
     dokku_log_fail "No data provided on stdin."
   fi
+  # TODO:
   docker exec -i "$SERVICE_NAME" mysql --user=mariadb --password="$PASSWORD" "$SERVICE"
 }
 
+# TODO following
 service_start() {
   local SERVICE="$1"
   local QUIET="$2"
