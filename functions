@@ -44,7 +44,7 @@ service_create_container() {
   local PASSWORD="$(cat "$SERVICE_ROOT/PASSWORD")"
   local CONFIGPASSWORD="$(cat "$SERVICE_ROOT/CONFIGPASSWORD")"
 
-  ID=$(docker run --name "$SERVICE_NAME" -v "$SERVICE_ROOT/data:/var/lib/ldap" -e "SLAPD_PASSWORD=$PASSWORD" -e "SLAP_CONFIG_PASSWORD=$CONFIGPASSWORD" -e "SLAP_DOMAIN=$SERVICE" --env-file="$SERVICE_ROOT/ENV" -d --restart always --label dokku=service --label dokku.service=mariadb "$PLUGIN_IMAGE:$PLUGIN_IMAGE_VERSION")
+  ID=$(docker run --name "$SERVICE_NAME" -v "$SERVICE_ROOT/data:/var/lib/ldap" -e "SLAPD_PASSWORD=$PASSWORD" -e "SLAP_CONFIG_PASSWORD=$CONFIGPASSWORD" -e "SLAP_DOMAIN=$SERVICE" --env-file="$SERVICE_ROOT/ENV" -d --restart always --label dokku=service --label dokku.service=ldap "$PLUGIN_IMAGE:$PLUGIN_IMAGE_VERSION")
   echo "$ID" > "$SERVICE_ROOT/ID"
 
   dokku_log_verbose_quiet "Waiting for container to be ready"
@@ -61,8 +61,20 @@ service_export() {
   local PASSWORD="$(cat "$SERVICE_ROOT/PASSWORD")"
 
   [[ -n $SSH_TTY ]] && stty -opost
-  # TODO:
-  docker exec "$SERVICE_NAME" mysqldump --user=mariadb --password="$PASSWORD" "$SERVICE"
+  docker exec "$SERVICE_NAME" slapcat
+  status=$?
+  [[ -n $SSH_TTY ]] && stty opost
+  exit $status
+}
+
+service_search() {
+  local SERVICE="$1"
+  local SERVICE_ROOT="$PLUGIN_DATA_ROOT/$SERVICE"
+  local SERVICE_NAME="$(get_service_name "$SERVICE")"
+  local PASSWORD="$(cat "$SERVICE_ROOT/PASSWORD")"
+
+  [[ -n $SSH_TTY ]] && stty -opost
+  docker exec "$SERVICE_NAME" ldapsearch -x -w "$PASSWORD" "${@:2}"
   status=$?
   [[ -n $SSH_TTY ]] && stty opost
   exit $status
@@ -77,11 +89,18 @@ service_import() {
   if [[ -t 0 ]]; then
     dokku_log_fail "No data provided on stdin."
   fi
-  # TODO:
-  docker exec -i "$SERVICE_NAME" mysql --user=mariadb --password="$PASSWORD" "$SERVICE"
+  docker exec -i "$SERVICE_NAME" slapadd -c
 }
 
-# TODO following
+service_modify() {
+  local SERVICE="$1"
+  local SERVICE_ROOT="$PLUGIN_DATA_ROOT/$SERVICE"
+  local SERVICE_NAME="$(get_service_name "$SERVICE")"
+  local PASSWORD="$(cat "$SERVICE_ROOT/PASSWORD")"
+
+  docker exec -i "$SERVICE_NAME" ldapmodify -x -w "$PASSWORD"
+}
+
 service_start() {
   local SERVICE="$1"
   local QUIET="$2"
@@ -96,14 +115,14 @@ service_start() {
   dokku_log_info1_quiet "Starting container"
   local PREVIOUS_ID=$(docker ps -f status=exited | grep -e "$SERVICE_NAME$" | awk '{print $1}') || true
   local IMAGE_EXISTS=$(docker images | grep -e "^$PLUGIN_IMAGE " | grep -q " $PLUGIN_IMAGE_VERSION " && true)
-  local ROOTPASSWORD="$(cat "$SERVICE_ROOT/ROOTPASSWORD")"
   local PASSWORD="$(cat "$SERVICE_ROOT/PASSWORD")"
+  local CONFIGPASSWORD="$(cat "$SERVICE_ROOT/CONFIGPASSWORD")"
 
   if [[ -n $PREVIOUS_ID ]]; then
     docker start "$PREVIOUS_ID" > /dev/null
     service_port_unpause "$SERVICE"
     dokku_log_info2 "Container started"
-  elif $IMAGE_EXISTS && [[ -n "$ROOTPASSWORD" ]] && [[ -n "$PASSWORD" ]]; then
+  elif $IMAGE_EXISTS && [[ -n "$PASSWORD" ]] && [[ -n "$CONFIGPASSWORD" ]]; then
     service_create_container "$SERVICE"
   else
     dokku_log_verbose_quiet "Neither container nor valid configuration exists for $SERVICE"
@@ -115,11 +134,12 @@ service_url() {
   local SERVICE_ROOT="$PLUGIN_DATA_ROOT/$SERVICE"
   local PASSWORD="$(cat "$SERVICE_ROOT/PASSWORD")"
   local SERVICE_ALIAS="$(service_alias "$SERVICE")"
-  echo "$PLUGIN_SCHEME://mariadb:$PASSWORD@$SERVICE_ALIAS:${PLUGIN_DATASTORE_PORTS[0]}/$SERVICE"
+  echo "$PLUGIN_SCHEME://admin:$PASSWORD@$SERVICE_ALIAS:${PLUGIN_DATASTORE_PORTS[0]}/$SERVICE"
+  echo "$PLUGIN_SCHEME://admin:$CONFIGPASSWORD@$SERVICE_ALIAS:${PLUGIN_DATASTORE_PORTS[0]}/$SERVICE"
 }
 
 update_plugin_scheme_for_app() {
   local APP="$1"
-  local MARIADB_DATABASE_SCHEME=$(config_get "$APP" MARIADB_DATABASE_SCHEME)
-  PLUGIN_SCHEME=${MARIADB_DATABASE_SCHEME:-$PLUGIN_SCHEME}
+  local LDAP_DIRECTORY_SCHEME=$(config_get "$APP" LDAP_DIRECTORY_SCHEME)
+  PLUGIN_SCHEME=${LDAP_DIRECTORY_SCHEME:-$PLUGIN_SCHEME}
 }

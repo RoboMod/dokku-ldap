@@ -20,23 +20,25 @@ sudo dokku plugin:install https://github.com/RoboMod/dokku-ldap.git ldap
 ## commands
 
 ```
-(ldap:clone <name> <new-name>  Create container <new-name> then copy directory from <name> into <new-name>)
-ldap:create <name>            Create an ldap service with environment variables
-ldap:destroy <name>           Delete the service and stop its container if there are no links left
-ldap:enter <name> [command]   Enter or run a command in a running ldap service container
-ldap:export <name> > <file>   Export a dump of the ldap service directory
-ldap:expose <name> [port]     Expose an ldap service on custom port if provided (random port otherwise)
-ldap:import <name> < <file>   Import a dump into the ldap service directory
-ldap:info <name>              Print the connection information
-ldap:link <name> <app>        Link the ldap service to the app
-ldap:list                     List all ldap services
-ldap:logs <name> [-t]         Print the most recent log(s) for this service
-ldap:promote <name> <app>     Promote service <name> as LDAP_URL in <app>
-ldap:restart <name>           Graceful shutdown and restart of the ldap service container
-ldap:start <name>             Start a previously stopped ldap service
-ldap:stop <name>              Stop a running ldap service
-ldap:unexpose <name>          Unexpose a previously exposed ldap service
-ldap:unlink <name> <app>      Unlink the ldap service from the app
+ldap:clone <name> <new-name>        Create container <new-name> then copy directory from <name> into <new-name>
+ldap:create <name>                  Create an ldap service with environment variables
+ldap:destroy <name>                 Delete the service and stop its container if there are no links left
+ldap:enter <name> [command]         Enter or run a command in a running ldap service container
+ldap:export <name> > <file>         Export a dump of the ldap service directory
+ldap:expose <name> [port]           Expose an ldap service on custom port if provided (random port otherwise)
+ldap:import <name> < <file>         Import a dump into the ldap service directory
+ldap:info <name>                    Print the connection information
+ldap:link <name> <app>              Link the ldap service to the app
+ldap:list                           List all ldap services
+ldap:logs <name> [-t]               Print the most recent log(s) for this service
+ldap:modify <name>                  Modify <name> via ldapmodify interactively
+ldap:promote <name> <app>           Promote service <name> as LDAP_URL in <app>
+ldap:restart <name>                 Graceful shutdown and restart of the ldap service container
+ldap:search <name> [parameters]     Search in the $PLUGIN_SERVICE service directory
+ldap:start <name>                   Start a previously stopped ldap service
+ldap:stop <name>                    Stop a running ldap service
+ldap:unexpose <name>                Unexpose a previously exposed ldap service
+ldap:unlink <name> <app>            Unlink the ldap service from the app
 ```
 
 ## usage
@@ -54,7 +56,7 @@ export LDAP_IMAGE_VERSION="<version>"
 dokku ldap:create lolipop
 
 # you can also specify custom environment
-# variables to start the mariadb service
+# variables to start the ldap service
 # in semi-colon separated forma
 export LDAP_CUSTOM_ENV="USER=alpha;HOST=beta"
 dokku ldap:create lolipop

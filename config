@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 export LDAP_IMAGE=${LDAP_IMAGE:="dinkel/openldap"}
 export LDAP_IMAGE_VERSION=${LDAP_IMAGE_VERSION:="2.4.40"}
-export LDAP_ROOT=${MARIADB_ROOT:="/var/lib/dokku/services/ldap"}
+export LDAP_ROOT=${LDAP_ROOT:="/var/lib/dokku/services/ldap"}
 
 export PLUGIN_COMMAND_PREFIX="ldap"
 export PLUGIN_DATA_ROOT=$LDAP_ROOT

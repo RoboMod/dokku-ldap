@@ -1,4 +1,4 @@
 [plugin]
-description = "dokku mariadb service plugin"
+description = "dokku ldap service plugin"
 version = "1.0.0"
 [plugin.config]

@@ -4,7 +4,7 @@ set -eo pipefail; [[ $DOKKU_TRACE ]] && set -x
 source "$PLUGIN_BASE_PATH/common/functions"
 source "$(dirname "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)")/functions"
 
-mariadb-clone-cmd() {
+ldap-clone-cmd() {
   declare desc="create container <new-name> then copy data from <name> into <new-name>"
   local cmd="$PLUGIN_COMMAND_PREFIX:clone" argv=("$@"); [[ ${argv[0]} == "$cmd" ]] && shift 1
   declare SERVICE="$1" NEW_SERVICE="$2"
@@ -19,4 +19,4 @@ mariadb-clone-cmd() {
   dokku_log_info1 "Done"
 }
 
-mariadb-clone-cmd "$@"
+ldap-clone-cmd "$@"
