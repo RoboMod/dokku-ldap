@@ -35,29 +35,29 @@ teardown() {
 
 @test "($PLUGIN_COMMAND_PREFIX:promote) error when the service is already promoted" {
   run dokku "$PLUGIN_COMMAND_PREFIX:promote" l my_app
-  assert_contains "${lines[*]}" "already promoted as DATABASE_URL"
+  assert_contains "${lines[*]}" "already promoted as DIRECTORY_URL"
 }
 
-@test "($PLUGIN_COMMAND_PREFIX:promote) changes DATABASE_URL" {
+@test "($PLUGIN_COMMAND_PREFIX:promote) changes DIRECTORY_URL" {
   password="$(cat "$PLUGIN_DATA_ROOT/l/PASSWORD")"
-  dokku config:set my_app "DATABASE_URL=mysql://u:p@host:3306/db" "DOKKU_MARIADB_BLUE_URL=mysql://mariadb:$password@dokku-mariadb-l:3306/l"
+  dokku config:set my_app "DIRECTORY_URL=ldap://u:p@host:389/db" "DOKKU_LDAP_BLUE_URL=ldap://admin:$password@dokku-ldap-l:389/l"
   dokku "$PLUGIN_COMMAND_PREFIX:promote" l my_app
-  url=$(dokku config:get my_app DATABASE_URL)
-  assert_equal "$url" "mysql://mariadb:$password@dokku-mariadb-l:3306/l"
+  url=$(dokku config:get my_app DIRECTORY_URL)
+  assert_equal "$url" "ldap://admin:$password@dokku-ldap-l:389/l"
 }
 
 @test "($PLUGIN_COMMAND_PREFIX:promote) creates new config url when needed" {
   password="$(cat "$PLUGIN_DATA_ROOT/l/PASSWORD")"
-  dokku config:set my_app "DATABASE_URL=mysql://u:p@host:3306/db" "DOKKU_MARIADB_BLUE_URL=mysql://mariadb:$password@dokku-mariadb-l:3306/l"
+  dokku config:set my_app "DIRECTORY_URL=ldap://u:p@host:389/db" "DOKKU_LDAP_BLUE_URL=ldap://admin:$password@dokku-ldap-l:389/l"
   dokku "$PLUGIN_COMMAND_PREFIX:promote" l my_app
   run dokku config my_app
-  assert_contains "${lines[*]}" "DOKKU_MARIADB_"
+  assert_contains "${lines[*]}" "DOKKU_LDAP_"
 }
 
 @test "($PLUGIN_COMMAND_PREFIX:promote) uses MARIADB_DATABASE_SCHEME variable" {
   password="$(cat "$PLUGIN_DATA_ROOT/l/PASSWORD")"
-  dokku config:set my_app "MARIADB_DATABASE_SCHEME=mysql2" "DATABASE_URL=mysql://u:p@host:3306/db" "DOKKU_MARIADB_BLUE_URL=mysql2://mariadb:$password@dokku-mariadb-l:3306/l"
+  dokku config:set my_app "LDAP_DIRECTORY_SCHEME=ldap2" "DIRECTORY_URL=ldap://u:p@host:389/db" "DOKKU_LDAP_BLUE_URL=ldap2://admin:$password@dokku-ldap-l:389/l"
   dokku "$PLUGIN_COMMAND_PREFIX:promote" l my_app
-  url=$(dokku config:get my_app DATABASE_URL)
-  assert_contains "$url" "mysql2://mariadb:$password@dokku-mariadb-l:3306/l"
+  url=$(dokku config:get my_app DIRECTORY_URL)
+  assert_contains "$url" "ldap2://admin:$password@dokku-ldap-l:389/l"
 }

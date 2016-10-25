@@ -27,7 +27,7 @@ teardown() {
   run dokku "$PLUGIN_COMMAND_PREFIX:export" l
   password="$(cat "$PLUGIN_DATA_ROOT/l/PASSWORD")"
   assert_exit_status 0
-  assert_output "docker exec dokku.mariadb.l mysqldump --user=mariadb --password=$password l"
+  assert_output "docker exec dokku.ldap.l slapcat"
 }
 
 @test "($PLUGIN_COMMAND_PREFIX:export) success without SSH_TTY" {
@@ -36,5 +36,5 @@ teardown() {
   run dokku "$PLUGIN_COMMAND_PREFIX:export" l
   password="$(cat "$PLUGIN_DATA_ROOT/l/PASSWORD")"
   assert_exit_status 0
-  assert_output "docker exec dokku.mariadb.l mysqldump --user=mariadb --password=$password l"
+  assert_output "docker exec dokku.ldap.l slapcat"
 }

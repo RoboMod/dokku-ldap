@@ -34,37 +34,37 @@ teardown() {
 @test "($PLUGIN_COMMAND_PREFIX:link) error when the service is already linked to app" {
   dokku "$PLUGIN_COMMAND_PREFIX:link" l my_app
   run dokku "$PLUGIN_COMMAND_PREFIX:link" l my_app
-  assert_contains "${lines[*]}" "Already linked as DATABASE_URL"
+  assert_contains "${lines[*]}" "Already linked as DIRECTORY_URL"
 }
 
-@test "($PLUGIN_COMMAND_PREFIX:link) exports DATABASE_URL to app" {
+@test "($PLUGIN_COMMAND_PREFIX:link) exports DIRECTORY_URL to app" {
   dokku "$PLUGIN_COMMAND_PREFIX:link" l my_app
-  url=$(dokku config:get my_app DATABASE_URL)
+  url=$(dokku config:get my_app DIRECTORY_URL)
   password="$(cat "$PLUGIN_DATA_ROOT/l/PASSWORD")"
-  assert_contains "$url" "mysql://mariadb:$password@dokku-mariadb-l:3306/l"
+  assert_contains "$url" "ldap://admin:$password@dokku-ldap-l:389/l"
   dokku "$PLUGIN_COMMAND_PREFIX:unlink" l my_app
 }
 
-@test "($PLUGIN_COMMAND_PREFIX:link) generates an alternate config url when DATABASE_URL already in use" {
-  dokku config:set my_app DATABASE_URL=mysql://user:pass@host:3306/db
+@test "($PLUGIN_COMMAND_PREFIX:link) generates an alternate config url when DIRECTORY_URL already in use" {
+  dokku config:set my_app DIRECTORY_URL=ldap://user:pass@host:3306/db
   dokku "$PLUGIN_COMMAND_PREFIX:link" l my_app
   run dokku config my_app
-  assert_contains "${lines[*]}" "DOKKU_MARIADB_"
+  assert_contains "${lines[*]}" "DOKKU_LDAP_"
   dokku "$PLUGIN_COMMAND_PREFIX:unlink" l my_app
 }
 
 @test "($PLUGIN_COMMAND_PREFIX:link) links to app with docker-options" {
   dokku "$PLUGIN_COMMAND_PREFIX:link" l my_app
   run dokku docker-options my_app
-  assert_contains "${lines[*]}" "--link dokku.mariadb.l:dokku-mariadb-l"
+  assert_contains "${lines[*]}" "--link dokku.ldap.l:dokku-ldap-l"
   dokku "$PLUGIN_COMMAND_PREFIX:unlink" l my_app
 }
 
-@test "($PLUGIN_COMMAND_PREFIX:link) uses apps MARIADB_DATABASE_SCHEME variable" {
-  dokku config:set my_app MARIADB_DATABASE_SCHEME=mariadb2
+@test "($PLUGIN_COMMAND_PREFIX:link) uses apps LDAP_DIRECTORY_SCHEME variable" {
+  dokku config:set my_app LDAP_DIRECTORY_SCHEME=ldap2
   dokku "$PLUGIN_COMMAND_PREFIX:link" l my_app
-  url=$(dokku config:get my_app DATABASE_URL)
+  url=$(dokku config:get my_app DIRECTORY_URL)
   password="$(cat "$PLUGIN_DATA_ROOT/l/PASSWORD")"
-  assert_contains "$url" "mariadb2://mariadb:$password@dokku-mariadb-l:3306/l"
+  assert_contains "$url" "ldap2://admin:$password@dokku-ldap-l:389/l"
   dokku "$PLUGIN_COMMAND_PREFIX:unlink" l my_app
 }
