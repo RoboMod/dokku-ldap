@@ -44,7 +44,7 @@ service_create_container() {
   local PASSWORD="$(cat "$SERVICE_ROOT/PASSWORD")"
   local CONFIGPASSWORD="$(cat "$SERVICE_ROOT/CONFIGPASSWORD")"
 
-  ID=$(docker run --name "$SERVICE_NAME" -v "$SERVICE_ROOT/data:/var/lib/ldap" -e "SLAPD_PASSWORD=$PASSWORD" -e "SLAP_CONFIG_PASSWORD=$CONFIGPASSWORD" -e "SLAP_DOMAIN=$SERVICE" --env-file="$SERVICE_ROOT/ENV" -d --restart always --label dokku=service --label dokku.service=ldap "$PLUGIN_IMAGE:$PLUGIN_IMAGE_VERSION")
+  ID=$(docker run --name "$SERVICE_NAME" -v "$SERVICE_ROOT/data:/var/lib/ldap" -v "$SERVICE_ROOT/config:/etc/ldap/slapd.d" -e "LAPD_ADMIN_PASSWORD=$PASSWORD" -e "LAPD_CONFIG_PASSWORD=$CONFIGPASSWORD" -e "LAPD_DOMAIN=$SERVICE" -e "LDAP_ORGANISATION=$SERVICE" --env-file="$SERVICE_ROOT/ENV" -d --restart always --label dokku=service --label dokku.service=ldap "$PLUGIN_IMAGE:$PLUGIN_IMAGE_VERSION")
   echo "$ID" > "$SERVICE_ROOT/ID"
 
   dokku_log_verbose_quiet "Waiting for container to be ready"

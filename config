@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-export LDAP_IMAGE=${LDAP_IMAGE:="dinkel/openldap"}
-export LDAP_IMAGE_VERSION=${LDAP_IMAGE_VERSION:="2.4.40"}
+export LDAP_IMAGE=${LDAP_IMAGE:="osixia/openldap"}
+export LDAP_IMAGE_VERSION=${LDAP_IMAGE_VERSION:="1.1.6"}
 export LDAP_ROOT=${LDAP_ROOT:="/var/lib/dokku/services/ldap"}
 
 export PLUGIN_COMMAND_PREFIX="ldap"
