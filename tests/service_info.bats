@@ -22,21 +22,24 @@ teardown() {
 @test "($PLUGIN_COMMAND_PREFIX:info) success" {
   run dokku "$PLUGIN_COMMAND_PREFIX:info" l
   local password="$(cat "$PLUGIN_DATA_ROOT/l/PASSWORD")"
-  assert_contains "${lines[*]}" "ldap://admin:$password@dokku-ldap-l:389/l"
+  local configpassword="$(cat "$PLUGIN_DATA_ROOT/l/CONFIGPASSWORD")"
+  assert_contains "${lines[*]}" "ldap://admin:$password:$configpassword@dokku-ldap-l:389/l"
 }
 
 @test "($PLUGIN_COMMAND_PREFIX:info) replaces underscores by dash in hostname" {
   dokku "$PLUGIN_COMMAND_PREFIX:create" test_with_underscores
   run dokku "$PLUGIN_COMMAND_PREFIX:info" test_with_underscores
   local password="$(cat "$PLUGIN_DATA_ROOT/test_with_underscores/PASSWORD")"
-  assert_contains "${lines[*]}" "ldap://admin:$password@dokku-ldap-test-with-underscores:389/l"
+  local configpassword="$(cat "$PLUGIN_DATA_ROOT/test_with_underscores/CONFIGPASSWORD")"
+  assert_contains "${lines[*]}" "ldap://admin:$password:$configpassword@dokku-ldap-test-with-underscores:389/test_with_underscores"
   dokku --force "$PLUGIN_COMMAND_PREFIX:destroy" test_with_underscores
 }
 
 @test "($PLUGIN_COMMAND_PREFIX:info) success with flag" {
   run dokku "$PLUGIN_COMMAND_PREFIX:info" l --dsn
   local password="$(cat "$PLUGIN_DATA_ROOT/l/PASSWORD")"
-  assert_output "ldap://admin:$password@dokku-ldap-l:389/l"
+  local configpassword="$(cat "$PLUGIN_DATA_ROOT/l/CONFIGPASSWORD")"
+  assert_output "ldap://admin:$password:$configpassword@dokku-ldap-l:389/l"
 
   run dokku "$PLUGIN_COMMAND_PREFIX:info" l --config-dir
   assert_success

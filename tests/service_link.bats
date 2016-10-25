@@ -41,12 +41,13 @@ teardown() {
   dokku "$PLUGIN_COMMAND_PREFIX:link" l my_app
   url=$(dokku config:get my_app DIRECTORY_URL)
   password="$(cat "$PLUGIN_DATA_ROOT/l/PASSWORD")"
-  assert_contains "$url" "ldap://admin:$password@dokku-ldap-l:389/l"
+  configpassword="$(cat "$PLUGIN_DATA_ROOT/l/CONFIGPASSWORD")"
+  assert_contains "$url" "ldap://admin:$password:$configpassword@dokku-ldap-l:389/l"
   dokku "$PLUGIN_COMMAND_PREFIX:unlink" l my_app
 }
 
 @test "($PLUGIN_COMMAND_PREFIX:link) generates an alternate config url when DIRECTORY_URL already in use" {
-  dokku config:set my_app DIRECTORY_URL=ldap://user:pass@host:3306/db
+  dokku config:set my_app DIRECTORY_URL=ldap://user:pass:configpass@host:389/d
   dokku "$PLUGIN_COMMAND_PREFIX:link" l my_app
   run dokku config my_app
   assert_contains "${lines[*]}" "DOKKU_LDAP_"
@@ -65,6 +66,7 @@ teardown() {
   dokku "$PLUGIN_COMMAND_PREFIX:link" l my_app
   url=$(dokku config:get my_app DIRECTORY_URL)
   password="$(cat "$PLUGIN_DATA_ROOT/l/PASSWORD")"
-  assert_contains "$url" "ldap2://admin:$password@dokku-ldap-l:389/l"
+  configpassword="$(cat "$PLUGIN_DATA_ROOT/l/CONFIGPASSWORD")"
+  assert_contains "$url" "ldap2://admin:$password:$configpassword@dokku-ldap-l:389/l"
   dokku "$PLUGIN_COMMAND_PREFIX:unlink" l my_app
 }

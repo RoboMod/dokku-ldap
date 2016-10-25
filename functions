@@ -25,7 +25,7 @@ service_create() {
   password=$(openssl rand -hex 8)
   configpassword=$(openssl rand -hex 8)
   echo "$password" > "$SERVICE_ROOT/PASSWORD"
-  echo "$password" > "$SERVICE_ROOT/CONFIGPASSWORD"
+  echo "$configpassword" > "$SERVICE_ROOT/CONFIGPASSWORD"
   chmod 640 "$SERVICE_ROOT/PASSWORD" "$SERVICE_ROOT/CONFIGPASSWORD"
   touch "$LINKS_FILE"
 
@@ -133,9 +133,9 @@ service_url() {
   local SERVICE="$1"
   local SERVICE_ROOT="$PLUGIN_DATA_ROOT/$SERVICE"
   local PASSWORD="$(cat "$SERVICE_ROOT/PASSWORD")"
+  local CONFIGPASSWORD="$(cat "$SERVICE_ROOT/CONFIGPASSWORD")"
   local SERVICE_ALIAS="$(service_alias "$SERVICE")"
-  echo "$PLUGIN_SCHEME://admin:$PASSWORD@$SERVICE_ALIAS:${PLUGIN_DATASTORE_PORTS[0]}/$SERVICE"
-  echo "$PLUGIN_SCHEME://admin:$CONFIGPASSWORD@$SERVICE_ALIAS:${PLUGIN_DATASTORE_PORTS[0]}/$SERVICE"
+  echo "$PLUGIN_SCHEME://admin:$PASSWORD:$CONFIGPASSWORD@$SERVICE_ALIAS:${PLUGIN_DATASTORE_PORTS[0]}/$SERVICE"
 }
 
 update_plugin_scheme_for_app() {

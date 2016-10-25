@@ -40,15 +40,17 @@ teardown() {
 
 @test "($PLUGIN_COMMAND_PREFIX:promote) changes DIRECTORY_URL" {
   password="$(cat "$PLUGIN_DATA_ROOT/l/PASSWORD")"
-  dokku config:set my_app "DIRECTORY_URL=ldap://u:p@host:389/db" "DOKKU_LDAP_BLUE_URL=ldap://admin:$password@dokku-ldap-l:389/l"
+  configpassword="$(cat "$PLUGIN_DATA_ROOT/l/CONFIGPASSWORD")"
+  dokku config:set my_app "DIRECTORY_URL=ldap://u:p:c@host:389/db" "DOKKU_LDAP_BLUE_URL=ldap://admin:$password:$configpassword@dokku-ldap-l:389/l"
   dokku "$PLUGIN_COMMAND_PREFIX:promote" l my_app
   url=$(dokku config:get my_app DIRECTORY_URL)
-  assert_equal "$url" "ldap://admin:$password@dokku-ldap-l:389/l"
+  assert_equal "$url" "ldap://admin:$password:$configpassword@dokku-ldap-l:389/l"
 }
 
 @test "($PLUGIN_COMMAND_PREFIX:promote) creates new config url when needed" {
   password="$(cat "$PLUGIN_DATA_ROOT/l/PASSWORD")"
-  dokku config:set my_app "DIRECTORY_URL=ldap://u:p@host:389/db" "DOKKU_LDAP_BLUE_URL=ldap://admin:$password@dokku-ldap-l:389/l"
+  configpassword="$(cat "$PLUGIN_DATA_ROOT/l/CONFIGPASSWORD")"
+  dokku config:set my_app "DIRECTORY_URL=ldap://u:p:c@host:389/db" "DOKKU_LDAP_BLUE_URL=ldap://admin:$password:$configpassword@dokku-ldap-l:389/l"
   dokku "$PLUGIN_COMMAND_PREFIX:promote" l my_app
   run dokku config my_app
   assert_contains "${lines[*]}" "DOKKU_LDAP_"
@@ -56,8 +58,9 @@ teardown() {
 
 @test "($PLUGIN_COMMAND_PREFIX:promote) uses MARIADB_DATABASE_SCHEME variable" {
   password="$(cat "$PLUGIN_DATA_ROOT/l/PASSWORD")"
-  dokku config:set my_app "LDAP_DIRECTORY_SCHEME=ldap2" "DIRECTORY_URL=ldap://u:p@host:389/db" "DOKKU_LDAP_BLUE_URL=ldap2://admin:$password@dokku-ldap-l:389/l"
+  configpassword="$(cat "$PLUGIN_DATA_ROOT/l/CONFIGPASSWORD")"
+  dokku config:set my_app "LDAP_DIRECTORY_SCHEME=ldap2" "DIRECTORY_URL=ldap://u:p:c@host:389/db" "DOKKU_LDAP_BLUE_URL=ldap2://admin:$password:$configpassword@dokku-ldap-l:389/l"
   dokku "$PLUGIN_COMMAND_PREFIX:promote" l my_app
   url=$(dokku config:get my_app DIRECTORY_URL)
-  assert_contains "$url" "ldap2://admin:$password@dokku-ldap-l:389/l"
+  assert_contains "$url" "ldap2://admin:$password:$configpassword@dokku-ldap-l:389/l"
 }
