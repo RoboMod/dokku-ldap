@@ -1,4 +1,4 @@
-#!/usr/bin/env bats
+cd #!/usr/bin/env bats
 load test_helper
 
 setup() {
@@ -21,10 +21,9 @@ teardown() {
   assert_contains "${lines[*]}" "service not_existing_service does not exist"
 }
 
-# TODO: change to search
-#@test "($PLUGIN_COMMAND_PREFIX:connect) success" {
-#  export ECHO_DOCKER_COMMAND="true"
-#  run dokku "$PLUGIN_COMMAND_PREFIX:connect" l
-#  password="$(cat "$PLUGIN_DATA_ROOT/l/PASSWORD")"
-#  assert_output "docker exec -i -t dokku.mariadb.l env TERM=$TERM mysql --user=mariadb --password=$password --database=l"
-#}
+@test "($PLUGIN_COMMAND_PREFIX:connect) success" {
+  export ECHO_DOCKER_COMMAND="true"
+  run dokku "$PLUGIN_COMMAND_PREFIX:search" l
+  password="$(cat "$PLUGIN_DATA_ROOT/l/PASSWORD")"
+  assert_output "docker exec -i -t dokku.mariadb.l env TERM=$TERM ldapsearch "
+}
