@@ -3,7 +3,7 @@
 Ldap plugin for dokku based on
 [dokku-mariadb](https://github.com/dokku/dokku-mariadb)/[commit
 d203db3](https://github.com/dokku/dokku-mariadb/commit/d203bd3c0ee759c7b6e64bef26eee4555787da5f). Currently defaults to installing
-[dinkel/openldap 2.4.40](https://hub.docker.com/r/dinkel/openldap/).
+[osixia/openldap 1.1.6](https://hub.docker.com/r/dinkel/openldap/).
 
 ## requirements (correct?)
 

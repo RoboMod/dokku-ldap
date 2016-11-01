@@ -6,7 +6,7 @@ source "$(dirname "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)")/functions"
 
 ldap-search-cmd() {
   declare desc="search in the $PLUGIN_SERVICE service directory"
-  local cmd="$PLUGIN_COMMAND_PREFIX:export" argv=("$@"); [[ ${argv[0]} == "$cmd" ]] && shift 1
+  local cmd="$PLUGIN_COMMAND_PREFIX:search" argv=("$@"); [[ ${argv[0]} == "$cmd" ]] && shift 1
   declare SERVICE="$1"
 
   [[ -z "$SERVICE" ]] && dokku_log_fail "Please specify a name for the service"

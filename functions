@@ -74,7 +74,7 @@ service_search() {
   local PASSWORD="$(cat "$SERVICE_ROOT/PASSWORD")"
 
   [[ -n $SSH_TTY ]] && stty -opost
-  docker exec "$SERVICE_NAME" ldapsearch -x -w "$PASSWORD" "${@:2}"
+  docker exec "$SERVICE_NAME" ldapsearch -x -h localhost -D "cn=admin,dc=$SERVICE" -w "$PASSWORD" "${@:2}"
   status=$?
   [[ -n $SSH_TTY ]] && stty opost
   exit $status
@@ -98,7 +98,7 @@ service_modify() {
   local SERVICE_NAME="$(get_service_name "$SERVICE")"
   local PASSWORD="$(cat "$SERVICE_ROOT/PASSWORD")"
 
-  docker exec -i "$SERVICE_NAME" ldapmodify -x -w "$PASSWORD"
+  docker exec -i "$SERVICE_NAME" ldapmodify -x -h localhost -D "cn=admin,dc=$SERVICE" -w "$PASSWORD"
 }
 
 service_start() {
