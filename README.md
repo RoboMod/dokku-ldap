@@ -1,4 +1,6 @@
-# dokku ldap
+**Work in progress!**
+
+# dokku ldap (pre-alpha) [![Build Status](https://img.shields.io/travis/RoboMod/dokku-ldap.svg?branch=master "Build Status")](https://travis-ci.org/RoboMod/dokku-ldap)
 
 Ldap plugin for dokku based on
 [dokku-mariadb](https://github.com/dokku/dokku-mariadb)/[commit
